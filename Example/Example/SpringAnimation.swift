@@ -38,6 +38,7 @@ class SpringAnimation: CAKeyframeAnimation
     {
         var values: [CGFloat] = []
         var value: CGFloat = 0
+        var valuePart:CGFloat = 0
         var valuesCount: Int = Int(self.duration * 60)
         var ω0: CGFloat = sqrt(self.stiffness / self.mass)  // angular frequency
         var β: CGFloat = self.damping / (2 * self.mass)     // amount of damping
@@ -51,8 +52,8 @@ class SpringAnimation: CAKeyframeAnimation
             if β < ω0 {
                 // underdamped
                 var ω1: CGFloat = sqrt(ω0 * ω0 - β * β)
-
-                value = exp(-β * t) * (x0 * cos(ω1 * t) + CGFloat((β * x0 + v0) / ω1) * sin(ω1 * t))
+                valuePart = (x0 * cos(ω1 * t) + CGFloat((β * x0 + v0) / ω1) * sin(ω1 * t))
+                value = exp(-β * t) * valuePart
             } else if β == ω0  {
                 // critically damped
                 value = exp(-β * t) * (x0 + (β * x0 + v0) * t)
@@ -60,10 +61,9 @@ class SpringAnimation: CAKeyframeAnimation
             else {
                 // overdamped
                 var ω2: CGFloat = sqrt(β * β - ω0 * ω0)
-
-                value = exp(-β * t) * (x0 * cosh(CGFloat(ω2 * t)) + ((β * x0 + v0) /  ω2) * sinh( ω2 * t))
+                valuePart = (x0 * cosh(CGFloat(ω2 * t)) + ((β * x0 + v0) /  ω2) * sinh( ω2 * t))
+                value = exp(-β * t) * valuePart
             }
-            
             values.append(self.toValue - value * (self.toValue - self.fromValue))
         }
         
